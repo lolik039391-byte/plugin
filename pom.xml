@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ru.skup</groupId>
-    <artifactId>skup-plugin</artifactId>
-    <version>1.0.0</version>
+    <artifactId>buyer-plugin</artifactId>
+    <version>1.1.1</version>
     <packaging>jar</packaging>
 
-    <name>SkupPlugin</name>
+    <name>BuyerPlugin</name>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -33,11 +33,34 @@
     </dependencies>
 
     <build>
+        <finalName>buyer-plugin</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>plugin.yml</include>
+                    <include>config.yml</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
             </plugin>
         </plugins>
     </build>

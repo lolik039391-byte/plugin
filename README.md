@@ -5,10 +5,10 @@
 ## Что умеет
 - `/buyer` открывает меню скупщика (54 слота)
 - Продажа предметов кликом по иконке:
-  - ЛКМ = 1 предмет
-  - ПКМ = 16 предметов
-  - Shift+ЛКМ = 64 предмета
-  - Q = продать все предметы этого типа
+    - ЛКМ = 1 предмет
+    - ПКМ = 16 предметов
+    - Shift+ЛКМ = 64 предмета
+    - Q = продать все предметы этого типа
 - Подсчет персональной цены с учетом permissions и happy-hour
 - Дневной лимит продаж
 - Статистика игрока и топ по заработку
@@ -30,4 +30,12 @@
 mvn clean package
 ```
 
-JAR: `target/skup-plugin-1.0.0.jar` (artifactId можно менять в `pom.xml` при необходимости).
+Готовый файл для сервера:
+- `target/buyer-plugin.jar`
+
+## Важно (ошибка `Jar does not contain plugin.yml`)
+Если сервер пишет `Invalid plugin.yml` / `Jar does not contain plugin.yml`, значит в папку `plugins/` положен **не тот JAR** (часто IDEA-artifact вроде `plugin-main-_1_.jar`).
+
+Используйте только JAR из `target/buyer-plugin.jar`, собранный Maven — в нём гарантированно присутствуют:
+- `plugin.yml`
+- `config.yml`
