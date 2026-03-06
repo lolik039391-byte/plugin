@@ -1,0 +1,23 @@
+name: BuyerPlugin
+version: 1.1.0
+main: ru.skup.plugin.SkupPlugin
+api-version: 1.16
+authors: [ "codex" ]
+description: Красивый GUI-скупщик с продажей по клику, лимитами и статистикой.
+
+commands:
+  buyer:
+    description: Открыть меню скупщика
+    usage: /buyer
+    aliases: [ skup ]
+
+permissions:
+  buyer.admin:
+    description: Админ-функции buyer
+    default: op
+  buyer.multiplier.vip:
+    description: VIP множитель цен
+    default: false
+  buyer.multiplier.elite:
+    description: ELITE множитель цен
+    default: false
