@@ -1,0 +1,22 @@
+name: SkupPlugin
+version: 1.0.0
+main: ru.skup.plugin.SkupPlugin
+api-version: 1.16
+authors: [ "codex" ]
+description: Продвинутый скупщик с лимитами, мультипликаторами и топом игроков.
+
+commands:
+  skup:
+    description: Главная команда скупщика
+    usage: /skup
+
+permissions:
+  skup.admin:
+    description: Админ-функции скупщика
+    default: op
+  skup.multiplier.vip:
+    description: VIP множитель цен
+    default: false
+  skup.multiplier.elite:
+    description: ELITE множитель цен
+    default: false

@@ -1,0 +1,27 @@
+# Цены за 1 предмет
+prices:
+  COBBLESTONE: 0.4
+  IRON_INGOT: 8.5
+  GOLD_INGOT: 12.0
+  DIAMOND: 35.0
+  EMERALD: 30.0
+  NETHERITE_SCRAP: 90.0
+  OAK_LOG: 1.4
+  STRING: 1.1
+  GUNPOWDER: 2.8
+
+# Лимиты (0 = без лимита)
+limits:
+  daily-items: 10000
+
+# Множители по правам: берется максимальный доступный
+permission-multipliers:
+  skup.multiplier.vip: 1.25
+  skup.multiplier.elite: 1.5
+
+# Счастливый час: во время окна применяется дополнительный множитель
+happy-hour:
+  enabled: true
+  start: "19:00"
+  end: "20:00"
+  multiplier: 1.35
