@@ -35,14 +35,22 @@ public class BuyerCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        if (args.length == 0 || args[0].equalsIgnoreCase("open")) {
-            openMenu((Player) sender);
+        if (args.length == 0) {
+            openMenu((Player) sender, 0);
             return true;
         }
 
         Player player = sender instanceof Player ? (Player) sender : null;
 
         switch (args[0].toLowerCase(Locale.ROOT)) {
+            case "open":
+                int page = parsePage(args.length >= 2 ? args[1] : "1");
+                if (page < 0) {
+                    sender.sendMessage(color("&cУкажи корректный номер страницы: /buyer open <номер>."));
+                    return true;
+                }
+                openMenu((Player) sender, page - 1);
+                return true;
             case "prices":
                 sendPrices(player);
                 return true;
@@ -67,7 +75,11 @@ public class BuyerCommand implements CommandExecutor, TabCompleter {
     }
 
     public void openMenu(Player player) {
-        player.openInventory(BuyerMenuFactory.build(player, priceService, statsService));
+        openMenu(player, 0);
+    }
+
+    public void openMenu(Player player, int page) {
+        player.openInventory(BuyerMenuFactory.build(player, priceService, statsService, page));
     }
 
     private void sendPrices(Player player) {
@@ -109,6 +121,15 @@ public class BuyerCommand implements CommandExecutor, TabCompleter {
         }
     }
 
+    private int parsePage(String raw) {
+        try {
+            int page = Integer.parseInt(raw);
+            return page > 0 ? page : -1;
+        } catch (NumberFormatException ignored) {
+            return -1;
+        }
+    }
+
     private String color(String message) {
         return ChatColor.translateAlternateColorCodes('&', message);
     }
@@ -120,6 +141,7 @@ public class BuyerCommand implements CommandExecutor, TabCompleter {
     private void sendHelp(CommandSender sender) {
         sender.sendMessage(color("&6==== Команды buyer ===="));
         sender.sendMessage(color("&e/buyer &7- открыть меню скупщика"));
+        sender.sendMessage(color("&e/buyer open <page> &7- открыть конкретную страницу"));
         sender.sendMessage(color("&e/buyer prices &7- посмотреть цены"));
         sender.sendMessage(color("&e/buyer stats &7- личная статистика"));
         sender.sendMessage(color("&e/buyer top &7- топ игроков"));
@@ -138,6 +160,11 @@ public class BuyerCommand implements CommandExecutor, TabCompleter {
             String part = args[0].toLowerCase(Locale.ROOT);
             return options.stream().filter(opt -> opt.startsWith(part)).collect(Collectors.toList());
         }
+
+        if (args.length == 2 && args[0].equalsIgnoreCase("open")) {
+            return Arrays.asList("1", "2", "3", "4", "5");
+        }
+
         return List.of();
     }
 }

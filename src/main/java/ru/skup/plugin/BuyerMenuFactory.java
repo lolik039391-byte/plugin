@@ -18,26 +18,35 @@ import java.util.stream.Collectors;
 
 public final class BuyerMenuFactory {
 
+    private static final int ITEMS_PER_PAGE = 45;
+
     private BuyerMenuFactory() {
     }
 
-    public static Inventory build(Player player, PriceService priceService, PlayerStatsService statsService) {
-        Inventory inv = Bukkit.createInventory(null, 54, BuyerCommand.MENU_TITLE);
+    public static Inventory build(Player player, PriceService priceService, PlayerStatsService statsService, int requestedPage) {
+        List<Map.Entry<Material, Double>> allEntries = priceService.getPrices().entrySet().stream()
+                .sorted(Comparator.comparing(e -> e.getKey().name()))
+                .collect(Collectors.toList());
+
+        int totalPages = Math.max(1, (int) Math.ceil(allEntries.size() / (double) ITEMS_PER_PAGE));
+        int page = Math.max(0, Math.min(requestedPage, totalPages - 1));
+
+        BuyerMenuHolder holder = new BuyerMenuHolder(page, totalPages);
+        Inventory inv = Bukkit.createInventory(holder, 54, BuyerCommand.MENU_TITLE + " §8[" + (page + 1) + "/" + totalPages + "]");
 
         ItemStack filler = makeItem(Material.GRAY_STAINED_GLASS_PANE, " ", List.of());
         for (int i = 0; i < inv.getSize(); i++) {
             inv.setItem(i, filler);
         }
 
-        List<Map.Entry<Material, Double>> priceEntries = priceService.getPrices().entrySet().stream()
-                .sorted(Comparator.comparing(e -> e.getKey().name()))
-                .limit(45)
-                .collect(Collectors.toList());
+        int from = page * ITEMS_PER_PAGE;
+        int to = Math.min(from + ITEMS_PER_PAGE, allEntries.size());
+        List<Map.Entry<Material, Double>> pageEntries = allEntries.subList(from, to);
 
         int slot = 0;
         double multiplier = priceService.resolvePlayerMultiplier(player);
 
-        for (Map.Entry<Material, Double> entry : priceEntries) {
+        for (Map.Entry<Material, Double> entry : pageEntries) {
             Material material = entry.getKey();
             double basePrice = entry.getValue();
             double finalPrice = basePrice * multiplier;
@@ -65,15 +74,30 @@ public final class BuyerMenuFactory {
                 color("&7Всего продано: &a" + statsService.getLifetimeItems(player.getUniqueId())),
                 color("&7Всего заработано: &6" + formatMoney(statsService.getLifetimeEarnings(player.getUniqueId())) + "$"),
                 color("&7Текущий множитель: &bx" + formatMoney(multiplier)),
+                color("&7Страница: &f" + (page + 1) + "/" + totalPages),
                 priceService.isHappyHour() ? color("&dСчастливый час активен!") : color("&8Счастливый час неактивен")
         )));
 
-        inv.setItem(45, makeItem(Material.BOOK, "&bПодсказка", List.of(
+        inv.setItem(46, makeItem(Material.BOOK, "&bПодсказка", List.of(
                 color("&7Нажимай на предметы, чтобы быстро продавать."),
                 color("&7Цены учитывают твои permissions и happy-hour.")
         )));
 
-        inv.setItem(53, makeItem(Material.BARRIER, "&cЗакрыть", List.of(color("&7Нажми, чтобы закрыть меню."))));
+        if (page > 0) {
+            inv.setItem(45, makeItem(Material.ARROW, "&aПредыдущая страница", List.of(
+                    color("&7Перейти на страницу &f" + page)
+            )));
+        } else {
+            inv.setItem(45, makeItem(Material.GRAY_DYE, "&8Предыдущая страница", List.of(color("&7Ты на первой странице"))));
+        }
+
+        if (page < totalPages - 1) {
+            inv.setItem(53, makeItem(Material.ARROW, "&aСледующая страница", List.of(
+                    color("&7Перейти на страницу &f" + (page + 2))
+            )));
+        } else {
+            inv.setItem(53, makeItem(Material.BARRIER, "&cЗакрыть", List.of(color("&7Нажми, чтобы закрыть меню."))));
+        }
 
         return inv;
     }

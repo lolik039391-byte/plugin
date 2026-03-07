@@ -30,7 +30,8 @@ public class BuyerMenuListener implements Listener {
             return;
         }
 
-        if (!BuyerCommand.MENU_TITLE.equals(event.getView().getTitle())) {
+        Inventory topInventory = event.getView().getTopInventory();
+        if (!(topInventory.getHolder() instanceof BuyerMenuHolder)) {
             return;
         }
 
@@ -38,9 +39,11 @@ public class BuyerMenuListener implements Listener {
 
         Player player = (Player) event.getWhoClicked();
         Inventory clickedInv = event.getClickedInventory();
-        if (clickedInv == null || !clickedInv.equals(event.getView().getTopInventory())) {
+        if (clickedInv == null || !clickedInv.equals(topInventory)) {
             return;
         }
+
+        BuyerMenuHolder holder = (BuyerMenuHolder) topInventory.getHolder();
 
         ItemStack clicked = event.getCurrentItem();
         if (clicked == null || clicked.getType() == Material.AIR) {
@@ -49,6 +52,16 @@ public class BuyerMenuListener implements Listener {
 
         if (clicked.getType() == Material.BARRIER) {
             player.closeInventory();
+            return;
+        }
+
+        if (clicked.getType() == Material.ARROW && event.getSlot() == 45) {
+            plugin.getBuyerCommand().openMenu(player, holder.getPage() - 1);
+            return;
+        }
+
+        if (clicked.getType() == Material.ARROW && event.getSlot() == 53) {
+            plugin.getBuyerCommand().openMenu(player, holder.getPage() + 1);
             return;
         }
 
@@ -70,7 +83,7 @@ public class BuyerMenuListener implements Listener {
         player.sendMessage(color("&aПродано: &f" + sold + "x " + BuyerMenuFactory.pretty(clicked.getType())
                 + " &aза &6" + formatMoney(earned) + "$"));
 
-        plugin.getBuyerCommand().openMenu(player);
+        plugin.getBuyerCommand().openMenu(player, holder.getPage());
     }
 
     private int resolveRequested(ClickType clickType) {
