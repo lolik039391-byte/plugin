@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class PriceService {
@@ -29,10 +30,12 @@ public class PriceService {
         ConfigurationSection priceSection = plugin.getConfig().getConfigurationSection("prices");
         if (priceSection != null) {
             for (String key : priceSection.getKeys(false)) {
-                Material material = Material.matchMaterial(key);
-                if (material != null) {
-                    prices.put(material, priceSection.getDouble(key, 0.0));
+                Material material = parseMaterial(key);
+                if (material == null) {
+                    plugin.getLogger().warning("[BuyerPlugin] Пропущен неизвестный материал в config.yml: " + key);
+                    continue;
                 }
+                prices.put(material, priceSection.getDouble(key, 0.0));
             }
         }
 
@@ -89,6 +92,19 @@ public class PriceService {
             return !now.isBefore(start) && !now.isAfter(end);
         } catch (Exception ignored) {
             return false;
+        }
+    }
+
+    private Material parseMaterial(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+
+        String normalized = raw.trim().toUpperCase(Locale.ROOT);
+        try {
+            return Material.valueOf(normalized);
+        } catch (IllegalArgumentException ignored) {
+            return null;
         }
     }
 
